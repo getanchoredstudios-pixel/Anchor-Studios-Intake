@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anchored Studios — Client Intake Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  .field-hint,.section-subtitle,label.field-label,.check-item span,.progress-label,.footer-note { font-size:14px!important; }
+  input[type=text], input[type=email], input[type=tel],textarea { font-size:16px!important; }
+  .btn:disabled {opacity:.6;cursor:wait;}
+
+  :root {
+    --navy: #0d1f3c;
+    --navy-mid: #1a3460;
+    --navy-light: #2e5fa3;
+    --silver: #d0dce8;
+    --silver-light: #eef2f7;
+    --white: #ffffff;
+    --text: #0d1f3c;
+    --muted: #6b7a99;
+    --border: #cdd6e4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--silver-light);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  .header {
+    background: var(--navy);
+    padding: 40px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '⚓';
+    position: absolute;
+    font-size: 200px;
+    opacity: 0.04;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(208,220,232,0.15);
+    border: 1px solid rgba(208,220,232,0.3);
+    color: var(--silver);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 40px);
+    color: white;
+    margin-bottom: 8px;
+  }
+
+  .header h1 span { color: var(--silver); font-style: italic; }
+  .header p { color: rgba(208,220,232,0.7); font-size: 14px; max-width: 400px; margin: 0 auto; }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    background: white;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .progress-step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    border: 2px solid var(--border);
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .progress-step.active { background: var(--navy); border-color: var(--navy); color: white; }
+  .progress-step.done { background: var(--navy-light); border-color: var(--navy-light); color: white; }
+
+  .progress-line { flex: 1; height: 2px; background: var(--border); }
+  .progress-line.done { background: var(--navy-light); }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+
+  /* SECTIONS */
+  .form-section {
+    display: none;
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .form-section.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--silver-light);
+  }
+
+  .section-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--navy);
+    color: var(--silver);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+  }
+
+  .section-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* FIELDS */
+  .field { margin-bottom: 18px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label.field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--navy-mid);
+    margin-bottom: 6px;
+  }
+
+  .required { color: var(--navy-light); }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    background: white;
+  }
+
+  input:focus, textarea:focus {
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(46,95,163,0.1);
+  }
+
+  input::placeholder, textarea::placeholder { color: #b0bacb; }
+  textarea { resize: vertical; min-height: 80px; }
+  .field-hint { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* CHECK ITEMS */
+  .check-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .check-item:hover { border-color: var(--navy-light); background: var(--silver-light); }
+  .check-item.selected { border-color: var(--navy); background: rgba(13,31,60,0.04); }
+
+  .check-item input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--navy);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .check-item span { font-size: 13px; line-height: 1.4; color: var(--text); }
+
+  /* BUTTONS */
+  .nav-buttons { display: flex; gap: 12px; margin-top: 24px; }
+
+  .btn {
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary { background: var(--navy); color: white; flex: 1; }
+  .btn-primary:hover { background: var(--navy-mid); transform: translateY(-1px); }
+
+  .btn-secondary { background: white; color: var(--navy); border: 1.5px solid var(--border); padding: 12px 20px; }
+  .btn-secondary:hover { border-color: var(--navy); }
+
+  .btn-submit { background: var(--silver); color: var(--navy); flex: 1; font-weight: 600; }
+  .btn-submit:hover { background: white; box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-2px); }
+
+  /* SUCCESS */
+  .success-screen {
+    display: none;
+    background: var(--navy);
+    border-radius: 8px;
+    padding: 48px 24px;
+    text-align: center;
+    color: white;
+  }
+
+  .success-screen.active { display: block; animation: fadeIn 0.4s ease; }
+  .success-anchor { font-size: 48px; margin-bottom: 16px; }
+
+  .success-screen h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+
+  .success-screen p {
+    color: rgba(208,220,232,0.75);
+    font-size: 14px;
+    max-width: 380px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 24px;
+    padding-bottom: 20px;
+  }
+
+  .footer-note span {
+    font-family: 'Playfair Display', serif;
+    color: var(--navy);
+    font-style: italic;
+  }
+
+  .error-msg {
+    background: #fff0f0;
+    border: 1px solid #ffcccc;
+    color: #cc0000;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="index.html" style="display:block;color:white;margin-bottom:18px;font-size:14px">Back to Anchored Studios</a><div class="header-badge">Anchored Studios</div>
+  <h1>Client <span>Intake Form</span></h1>
+  <p>Fill this out so we can build your business the right way from day one.</p>
+</div>
+
+<div class="container">
+
+  <!-- PROGRESS -->
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-step active" id="step1">1</div>
+    <div class="progress-line" id="line1"></div>
+    <div class="progress-step" id="step2">2</div>
+    <div class="progress-line" id="line2"></div>
+    <div class="progress-step" id="step3">3</div>
+    <div class="progress-line" id="line3"></div>
+    <div class="progress-step" id="step4">4</div>
+    <div class="progress-line" id="line4"></div>
+    <div class="progress-step" id="step5">5</div>
+    <span class="progress-label" id="progressLabel">Basic Info</span>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="form-section active" id="section1">
+    <div class="section-header">
+      <div class="section-icon">👤</div>
+      <div>
+        <div class="section-title">Your Basic Info</div>
+        <div class="section-subtitle">Let's start with who you are</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">First Name <span class="required">*</span></label>
+      <input type="text" id="firstName" placeholder="First name" />
+    </div>
+    <div class="field">
+      <label class="field-label">Last Name <span class="required">*</span></label>
+      <input type="text" id="lastName" placeholder="Last name" />
+    </div>
+    <div class="field">
+      <label class="field-label">Phone Number <span class="required">*</span></label>
+      <input type="tel" id="phone" placeholder="(410) 000-0000" />
+    </div>
+    <div class="field">
+      <label class="field-label">Current Email</label>
+      <input type="email" id="email" placeholder="your@email.com" />
+      <div class="field-hint">Don't have one yet? No worries — we'll set one up for you.</div>
+    </div>
+    <div class="field">
+      <label class="field-label">City / Area You Work In <span class="required">*</span></label>
+      <input type="text" id="city" placeholder="e.g. Baltimore, Joppa, Harford County..." />
+    </div>
+
+    <div class="error-msg" id="err1">Please fill in your name, phone number, and city to continue.</div>
+    <div class="nav-buttons">
+      <button class="btn btn-primary" onclick="next(1)">Next — Business Name →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="form-section" id="section2">
+    <div class="section-header">
+      <div class="section-icon">💡</div>
+      <div>
+        <div class="section-title">Business Name Ideas</div>
+        <div class="section-subtitle">What do you want your business to be called?</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">What name style feels right? (check all that apply)</label>
+      <div class="check-list">
+        <label class="check-item"><input type="checkbox" name="nameStyle" value="Your last name (e.g. Beattie Auto)" /><span>Your last name (e.g. Beattie Auto)</span></label>
+        <label class="check-item"><input type="checkbox" name="nameStyle" value="Your first name (e.g. Curtis Mobile)" /><span>Your first name (e.g. Curtis Mobile)</span></label>
+        <label class="check-item"><input type="checkbox" name="nameStyle" value="Something tough and powerful" /><span>Something tough and powerful</span></label>
+        <label class="check-item"><input type="checkbox" name="nameStyle" value="Something local or geographic" /><span>Something local or geographic</span></label>
+        <label class="check-item"><input type="checkbox" name="nameStyle" value="Something that describes the service" /><span>Something that describes the service</span></label>
+        <label class="check-item"><input type="checkbox" name="nameStyle" value="Something totally made up" /><span>Something totally made up</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Any name ideas you already have in mind?</label>
+      <textarea id="nameIdeas" placeholder="Anything at all — even rough ideas. Nothing is too silly."></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Words that describe your work style or vibe</label>
+      <input type="text" id="vibeWords" placeholder="e.g. reliable, fast, honest, mobile, no-nonsense..." />
+    </div>
+    <div class="field">
+      <label class="field-label">Gmail Username Ideas</label>
+      <input type="text" id="gmailIdeas" placeholder="e.g. curtisauto, beattiemechanics, fixitwithcurtis..." />
+      <div class="field-hint">Give 2–3 ideas and we'll check availability and set up your business email.</div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prev(2)">← Back</button>
+      <button class="btn btn-primary" onclick="next(2)">Next — Services →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="form-section" id="section3">
+    <div class="section-header">
+      <div class="section-icon">🔧</div>
+      <div>
+        <div class="section-title">Your Services</div>
+        <div class="section-subtitle">Check everything you offer or plan to offer</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="serviceSummary">What does your business offer?</label><textarea id="serviceSummary" placeholder="Describe your products, services, and the people you help."></textarea></div>
+    <div class="field">
+      <label class="field-label">Any other services not listed?</label>
+      <textarea id="otherServices" placeholder="List anything else you do or want to offer..."></textarea>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prev(3)">← Back</button>
+      <button class="btn btn-primary" onclick="next(3)">Next — Pricing →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="form-section" id="section4">
+    <div class="section-header">
+      <div class="section-icon">💰</div>
+      <div>
+        <div class="section-title">Pricing & Payments</div>
+        <div class="section-subtitle">How you charge and how you get paid</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Do you have set prices for your services?</label>
+      <div class="check-list">
+        <label class="check-item"><input type="radio" name="pricing" value="Yes — I know what I charge for most things" /><span>Yes — I know what I charge for most things</span></label>
+        <label class="check-item"><input type="radio" name="pricing" value="Sort of — I charge what feels right in the moment" /><span>Sort of — I charge what feels right in the moment</span></label>
+        <label class="check-item"><input type="radio" name="pricing" value="No — I need help figuring out my prices" /><span>No — I need help figuring out my prices</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">How do you currently get paid? (check all that apply)</label>
+      <div class="check-list">
+        <label class="check-item"><input type="checkbox" name="payment" value="Cash" /><span>Cash</span></label>
+        <label class="check-item"><input type="checkbox" name="payment" value="Zelle" /><span>Zelle</span></label>
+        <label class="check-item"><input type="checkbox" name="payment" value="Cash App" /><span>Cash App</span></label>
+        <label class="check-item"><input type="checkbox" name="payment" value="Venmo" /><span>Venmo</span></label>
+        <label class="check-item"><input type="checkbox" name="payment" value="I don't have a system yet" /><span>I don't have a system yet</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Do you want to accept card payments?</label>
+      <div class="check-list">
+        <label class="check-item"><input type="radio" name="cards" value="Yes — I want to take cards" /><span>Yes — I want to take cards</span></label>
+        <label class="check-item"><input type="radio" name="cards" value="No — cash and apps are fine for now" /><span>No — cash and apps are fine for now</span></label>
+        <label class="check-item"><input type="radio" name="cards" value="Not sure yet" /><span>Not sure yet</span></label>
+      </div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prev(4)">← Back</button>
+      <button class="btn btn-primary" onclick="next(4)">Next — Your Vision →</button>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="form-section" id="section5">
+    <div class="section-header">
+      <div class="section-icon">🚀</div>
+      <div>
+        <div class="section-title">Your Vision</div>
+        <div class="section-subtitle">Where you want this to go</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Is this a side hustle or are you going full time?</label>
+      <div class="check-list">
+        <label class="check-item"><input type="radio" name="hustle" value="Side hustle — extra income on top of my job" /><span>Side hustle — extra income on top of my job</span></label>
+        <label class="check-item"><input type="radio" name="hustle" value="I want this to be my full time business eventually" /><span>I want this to be my full time business eventually</span></label>
+        <label class="check-item"><input type="radio" name="hustle" value="Not sure yet — depends on how it goes" /><span>Not sure yet — depends on how it goes</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Do you work alone or do you have help?</label>
+      <div class="check-list">
+        <label class="check-item"><input type="radio" name="team" value="Just me right now" /><span>Just me right now</span></label>
+        <label class="check-item"><input type="radio" name="team" value="I bring people in sometimes" /><span>I bring people in sometimes</span></label>
+        <label class="check-item"><input type="radio" name="team" value="I want to build a team eventually" /><span>I want to build a team eventually</span></label>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">What does success look like in 1 year?</label>
+      <textarea id="successVision" placeholder="e.g. Steady clients every week, making $X a month, quitting my job..."></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Anything else you want me to know?</label>
+      <textarea id="anythingElse" placeholder="Your situation, goals, things that have held you back..."></textarea>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prev(5)">← Back</button>
+      <button class="btn btn-submit" onclick="submitForm()">Submit to Anchored Studios ⚓</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-anchor">⚓</div>
+    <h2>You're all set!</h2>
+    <p>Got everything I need. I'll be in touch soon to start building your business out right. Welcome aboard.</p>
+  </div>
+
+  <div class="footer-note">
+    Powered by <span>Anchored Studios</span> · We drop anchor so your business stops drifting.
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('label.field-label').forEach(label => {
+    const input = label.parentElement.querySelector('input[id], textarea[id]');
+    if (input) label.htmlFor = input.id;
+  });
+  const chosen = new URLSearchParams(location.search).get('package');
+  if (chosen) document.getElementById('anythingElse').value = 'I am interested in ' + chosen + '.';
+  const sectionLabels = ['Basic Info', 'Business Name', 'Services', 'Pricing', 'Your Vision'];
+  let current = 1;
+
+  document.querySelectorAll('.check-item input').forEach(input => {
+    input.addEventListener('change', () => {
+      input.closest('.check-item').classList.toggle('selected', input.checked);
+    });
+  });
+
+  function updateProgress(n) {
+    for (let i = 1; i <= 5; i++) {
+      const s = document.getElementById('step' + i);
+      const l = document.getElementById('line' + i);
+      if (i < n) { s.className = 'progress-step done'; s.innerHTML = '✓'; if(l) l.className = 'progress-line done'; }
+      else if (i === n) { s.className = 'progress-step active'; s.innerHTML = i; }
+      else { s.className = 'progress-step'; s.innerHTML = i; if(l) l.className = 'progress-line'; }
+    }
+    document.getElementById('progressLabel').textContent = sectionLabels[n-1];
+  }
+
+  function next(n) {
+    if (n === 1) {
+      const fn = document.getElementById('firstName').value.trim();
+      const ln = document.getElementById('lastName').value.trim();
+      const ph = document.getElementById('phone').value.trim();
+      const ct = document.getElementById('city').value.trim();
+      const err = document.getElementById('err1');
+      if (!fn || !ln || !ph || !ct) { err.style.display = 'block'; return; }
+      err.style.display = 'none';
+    }
+    document.getElementById('section' + n).classList.remove('active');
+    current = n + 1;
+    document.getElementById('section' + current).classList.add('active');
+    updateProgress(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prev(n) {
+    document.getElementById('section' + n).classList.remove('active');
+    current = n - 1;
+    document.getElementById('section' + current).classList.add('active');
+    updateProgress(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function getChecked(name) {
+    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked')).map(i => i.value).join(', ') || 'None selected';
+  }
+
+  async function submitForm() {
+    const data = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      nameStyle: getChecked('nameStyle'),
+      nameIdeas: document.getElementById('nameIdeas').value.trim(),
+      vibeWords: document.getElementById('vibeWords').value.trim(),
+      gmailIdeas: document.getElementById('gmailIdeas').value.trim(),
+      services: document.getElementById('serviceSummary').value.trim(),
+      selectedPackage: new URLSearchParams(location.search).get('package') || 'Custom project',
+      otherServices: document.getElementById('otherServices').value.trim(),
+      pricing: getChecked('pricing'),
+      payment: getChecked('payment'),
+      cards: getChecked('cards'),
+      hustle: getChecked('hustle'),
+      team: getChecked('team'),
+      successVision: document.getElementById('successVision').value.trim(),
+      anythingElse: document.getElementById('anythingElse').value.trim()
+    };
+
+    const button = document.querySelector('.btn-submit');
+    const emailField = document.getElementById('email');
+    if (data.email && !emailField.checkValidity()) {
+      current = 1;
+      document.getElementById('section5').classList.remove('active');
+      document.getElementById('section1').classList.add('active');
+      updateProgress(1);
+      emailField.reportValidity();
+      return;
+    }
+    let error = document.getElementById('submitError');
+    if (!error) { error = document.createElement('p'); error.id = 'submitError'; error.setAttribute('role','alert'); error.style.color = '#a31717'; button.parentElement.after(error); }
+    error.textContent = '';
+    button.disabled = true;
+    button.textContent = 'Sending…';
+    try {
+      const response = await fetch('https://formspree.io/f/xojzlonj', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept':'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Submission failed');
+      document.getElementById('section5').classList.remove('active');
+      document.getElementById('progressBar').style.display = 'none';
+      document.getElementById('successScreen').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (_) {
+      error.textContent = 'Your brief could not be sent. Please try again. Your entries are still here.';
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Submit to Anchored Studios';
+    }
+  }
+</script>
+</body>
+</html>
+
